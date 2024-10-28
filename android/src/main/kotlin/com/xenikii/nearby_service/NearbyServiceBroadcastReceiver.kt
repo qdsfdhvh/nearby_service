@@ -34,7 +34,7 @@ class NearbyServiceBroadcastReceiver(
             }
 
             WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION -> {
-                writeDevices()
+                writeDevices({ intent.getParcelableExtra(WifiP2pManager.EXTRA_P2P_DEVICE_LIST) })
             }
 
             WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION -> {
@@ -76,17 +76,22 @@ class NearbyServiceBroadcastReceiver(
         }
     }
 
-    private fun writeDevices() {
+    private fun writeDevices(intentPeersProvider: (() -> WifiP2pDeviceList?)? = null) {
         try {
             wifiManager.requestPeers(
                 wifiChannel
             ) { newPeers: WifiP2pDeviceList ->
                 val list: MutableList<String> = mutableListOf()
 
-                if (newPeers.deviceList.isEmpty() && connectedDevice != null) {
+                val finalNewPeers = if (newPeers.deviceList.isEmpty() && intentPeersProvider != null) {
+                    intentPeersProvider() ?: newPeers
+                } else {
+                    newPeers
+                }
+                if (finalNewPeers.deviceList.isEmpty() && connectedDevice != null) {
                     connectedDevice = null
                 }
-                for (device: WifiP2pDevice in newPeers.deviceList) {
+                for (device: WifiP2pDevice in finalNewPeers.deviceList) {
                     list.add(device.toJsonString())
                     if (device.status == WifiP2pDevice.CONNECTED) {
                         connectedDevice = device
