@@ -25,6 +25,7 @@ apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 
 android {
+    namespace 'com.xenikii.nearby_service'
     compileSdk 33
 
     compileOptions {
