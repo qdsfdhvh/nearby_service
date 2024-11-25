@@ -6,6 +6,7 @@ class _Protocols {
 }
 
 class _Urls {
+  static const ping = '/ping';
   static const ws = '/ws';
 }
 
@@ -17,7 +18,7 @@ class NearbyServiceNetwork {
     required int port,
   }) async {
     try {
-      final url = Uri.parse('${_Protocols.http}$address:$port/');
+      final url = Uri.parse('${_Protocols.http}$address:$port${_Urls.ping}');
       final request = (await _httpClient.postUrl(url))
         ..write(_Commands.ping.name);
       final response = await request.close();

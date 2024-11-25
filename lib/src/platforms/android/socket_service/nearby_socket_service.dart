@@ -189,8 +189,7 @@ class NearbySocketService {
     _server?.listen(
       (request) async {
         _androidData.serverListener?.call(request);
-        final isPing = await _pingManager.checkPing(request);
-        if (isPing) {
+        if (request.uri.path == _Urls.ping) {
           Logger.debug('Server got ping request');
           _network.pongClient(request);
           return;
